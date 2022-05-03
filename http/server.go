@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"cabinet/cache"
