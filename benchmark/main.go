@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cabinet/cache-benchmark/cacheClient"
+	"cabinet/benchmark/cacheClient"
 	"flag"
 	"fmt"
 	"math/rand"
