@@ -2,10 +2,10 @@ package main
 
 import (
 	"cabinet/cache"
-	"cabinet/http"
+	server "cabinet/tcp"
 )
 
 func main() {
 	c := cache.New("inmemory")
-	http.New(c).Listen()
+	server.New(c).Listen()
 }
