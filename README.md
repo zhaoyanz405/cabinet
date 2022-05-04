@@ -2,6 +2,12 @@
 A distribute memory cache storage for Go
 
 ## Benchmark
+|         | Set                       | Get                       |
+|---------|---------------------------|---------------------------|
+| HTTP    | 37 us/op </br> 26107 op/s | 36 us/op </br> 26859 op/s |
+| TCP     | 29 us/op </br> 32406 op/s | 28 us/op </br> 33885 op/s |
+| Rocksdb | 39 us/op </br> 24601 op/s | 40 us/op </br> 24086 op/s |
+
 ### HTTP
 
 #### Set
@@ -109,5 +115,79 @@ pipeline length is 1
 28 usec average for each request
 throughput is 21.367935 MB/s
 rps is 33885.622385
+
+```
+
+### Rocksdb
+
+#### Set
+```text
+ % ./benchmark -type tcp -n 100000 -r 100000 -t set
+type is tcp
+server is localhost
+total 100000 requests
+data size is 1000
+we have 1 connections
+operation is set
+keyspacelen is 100000
+pipeline length is 1
+0 records get
+0 records miss
+100000 records set
+4.064833 seconds total
+99% requests < 1 ms
+99% requests < 2 ms
+99% requests < 3 ms
+99% requests < 4 ms
+99% requests < 5 ms
+99% requests < 6 ms
+99% requests < 17 ms
+99% requests < 18 ms
+99% requests < 28 ms
+99% requests < 29 ms
+99% requests < 30 ms
+99% requests < 50 ms
+100% requests < 69 ms
+39 usec average for each request
+throughput is 24.601257 MB/s
+rps is 24601.257184
+
+```
+
+#### Get
+```text
+% ./benchmark -type tcp -n 100000 -r 100000 -t get
+type is tcp
+server is localhost
+total 100000 requests
+data size is 1000
+we have 1 connections
+operation is get
+keyspacelen is 100000
+pipeline length is 1
+63179 records get
+36821 records miss
+0 records set
+4.151755 seconds total
+99% requests < 1 ms
+99% requests < 2 ms
+99% requests < 3 ms
+99% requests < 4 ms
+99% requests < 5 ms
+99% requests < 6 ms
+99% requests < 7 ms
+99% requests < 8 ms
+99% requests < 9 ms
+99% requests < 10 ms
+99% requests < 12 ms
+99% requests < 26 ms
+99% requests < 27 ms
+99% requests < 30 ms
+99% requests < 31 ms
+99% requests < 150 ms
+100% requests < 189 ms
+40 usec average for each request
+throughput is 15.217422 MB/s
+rps is 24086.202111
 
 ```
