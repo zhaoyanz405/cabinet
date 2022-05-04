@@ -6,15 +6,15 @@ import (
 )
 
 type Cache interface {
-	Set(string, [] byte) error
+	Set(string, []byte) error
 	Get(string) ([]byte, error)
 	Del(string) error
 	GetStat() Stat
 }
 
 type Stat struct {
-	Count int64
-	KeySize int64
+	Count     int64
+	KeySize   int64
 	ValueSize int64
 }
 
@@ -33,7 +33,11 @@ func (s *Stat) del(k string, v []byte) {
 func New(typ string) Cache {
 	var c Cache
 	if typ == "inmemory" {
-		c= newInMemoryCache()
+		c = newInMemoryCache()
+	}
+
+	if typ == "rocksdb" {
+		c = newRocksdbCache()
 	}
 
 	if c == nil {
@@ -45,7 +49,7 @@ func New(typ string) Cache {
 }
 
 type inMemoryCache struct {
-	c map[string][]byte
+	c     map[string][]byte
 	mutex sync.RWMutex
 	Stat
 }
@@ -67,7 +71,6 @@ func (c *inMemoryCache) Get(k string) ([]byte, error) {
 	defer c.mutex.RUnlock()
 	return c.c[k], nil
 }
-
 
 func (c *inMemoryCache) Del(k string) error {
 	c.mutex.Lock()

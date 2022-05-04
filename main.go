@@ -2,10 +2,18 @@ package main
 
 import (
 	"cabinet/cache"
-	server "cabinet/tcp"
+	"cabinet/http"
+	"cabinet/tcp"
+	"flag"
+	"log"
 )
 
 func main() {
-	c := cache.New("inmemory")
-	server.New(c).Listen()
+	typ := flag.String("type", "inmemory", "cache type")
+	flag.Parse()
+	log.Println("type is", *typ)
+
+	c := cache.New(*typ)
+	go tcp.New(c).Listen()
+	http.New(c).Listen()
 }
