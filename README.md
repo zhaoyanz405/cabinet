@@ -1,5 +1,10 @@
-# cabinet
-A distribute memory cache storage for Go
+# What is Cabinet?
+Cabinet is a really fast key-value cache server, written by Go. It is composed of two parts, the server and the client. 
+The client provides some commands and options which are sent with TCP sockets.
+
+## Get started
+
+If you have Golang environment, what you need to do is cloning the git repository, enter the root directory, and run `go build`
 
 ## Benchmark
 |         | Set                       | Get                       |
