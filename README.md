@@ -6,6 +6,11 @@ The client provides some commands and options which are sent with TCP sockets.
 
 If you have Golang environment, what you need to do is cloning the git repository, enter the root directory, and run `go build`
 
+## Coming soon
+
+- Support to using in distributed mode
+- Lifecycle of cache data
+
 ## Benchmark
 |         | Set                       | Get                       |
 |---------|---------------------------|---------------------------|
