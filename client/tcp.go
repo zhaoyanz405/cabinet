@@ -1,4 +1,4 @@
-package cacheClient
+package main
 
 import (
 	"bufio"
@@ -100,9 +100,9 @@ func (c *tcpClient) PipelinedRun(cmds []*Cmd) {
 		if cmd.Name == "del" {
 			c.sendDel(cmd.Key)
 		}
-	}
-	for _, cmd := range cmds {
-		cmd.Value, cmd.Error = c.recvResponse()
+		for _, cmd := range cmds {
+			cmd.Value, cmd.Error = c.recvResponse()
+		}
 	}
 }
 
