@@ -64,6 +64,6 @@ func newHTTPClient(server string) *httpClient {
 	return &httpClient{client, "http://" + server + ":12345/cache"}
 }
 
-func (c *httpClient) PipelineRun([]*Cmd) {
+func (c *httpClient) PipelinedRun([]*Cmd) {
 	panic("httpClient pipelined run not implemented")
 }
