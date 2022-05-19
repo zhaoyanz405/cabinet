@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cabinet/benchmark/cacheClient"
+	"cabinet/client"
 	"flag"
 	"fmt"
 )
@@ -12,9 +12,9 @@ func main() {
 	key := flag.String("k", "", "key")
 	value := flag.String("v", "", "value")
 	flag.Parse()
-	client := cacheClient.New("tcp", *server)
-	cmd := &cacheClient.Cmd{Name: *op, Key: *key, Value: *value}
-	client.Run(cmd)
+	c := client.New("tcp", *server)
+	cmd := &client.Cmd{Name: *op, Key: *key, Value: *value}
+	c.Run(cmd)
 	if cmd.Error != nil {
 		fmt.Println("error:", cmd.Error)
 	} else {
