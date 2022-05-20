@@ -2,6 +2,7 @@ package http
 
 import (
 	"cabinet/cache"
+	"cabinet/cluster"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -11,16 +12,18 @@ import (
 
 type Server struct {
 	cache.Cache
+	cluster.Node
 }
 
 func (s *Server) Listen() {
 	http.Handle("/cache/", s.cacheHandler())
 	http.Handle("/status", s.statusHandler())
+	http.Handle("/cluster", s.clusterHandler())
 	http.ListenAndServe(":12345", nil)
 }
 
-func New(c cache.Cache) *Server {
-	return &Server{c}
+func New(c cache.Cache, n cluster.Node) *Server {
+	return &Server{c, n}
 }
 
 type cacheHandler struct {
@@ -101,4 +104,27 @@ func (h *statusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) statusHandler() http.Handler {
 	return &statusHandler{s}
+}
+
+type clusterHandler struct {
+	*Server
+}
+
+func (h *clusterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	m := h.Members()
+	b, e := json.Marshal(m)
+	if e != nil {
+		log.Println(e)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}
+
+func (s *Server) clusterHandler() http.Handler {
+	return &clusterHandler{s}
 }
