@@ -1,10 +1,12 @@
 # What is Cabinet?
-Cabinet is a really fast key-value cache server, written by Go. It is composed of two parts, the server and the client. 
+
+Cabinet is a really fast key-value cache server, written by Go. It is composed of two parts, the server and the client.
 The client provides some commands and options which are sent with TCP sockets.
 
 ## Get started
 
-If you have Golang environment, what you need to do is cloning the git repository, enter the root directory, and run `go build`
+If you have Golang environment, what you need to do is cloning the git repository, enter the root directory, and
+run `go build`
 
 ## Coming soon
 
@@ -12,15 +14,18 @@ If you have Golang environment, what you need to do is cloning the git repositor
 - Lifecycle of cache data
 
 ## Benchmark
-|         | Set                       | Get                       |
-|---------|---------------------------|---------------------------|
-| HTTP    | 37 us/op </br> 26107 op/s | 36 us/op </br> 26859 op/s |
-| TCP     | 29 us/op </br> 32406 op/s | 28 us/op </br> 33885 op/s |
-| Rocksdb | 39 us/op </br> 24601 op/s | 40 us/op </br> 24086 op/s |
+
+|           | Set                       | Get                       |
+|-----------|---------------------------|---------------------------|
+| HTTP      | 37 us/op </br> 26107 op/s | 36 us/op </br> 26859 op/s |
+| TCP       | 29 us/op </br> 32406 op/s | 28 us/op </br> 33885 op/s |
+| Rocksdb   | 39 us/op </br> 24601 op/s | 40 us/op </br> 24086 op/s |
+| Pipeline  | 47779 op/s                | 51309 op/s                |
 
 ### HTTP
 
 #### Set
+
 ```text
 % ./cache-benchmark -type http -n 100000 -r 100000 -t set
 type is http
@@ -41,7 +46,9 @@ pipeline length is 1
 throughput is 26.107967 MB/s
 rps is 26107.966910
 ```
+
 #### GET
+
 ```text
 % ./cache-benchmark -type http -n 100000 -r 100000 -t get
 type is http
@@ -69,6 +76,7 @@ rps is 26859.576918
 ### TCP
 
 #### Set
+
 ```text
 % ./benchmark -type tcp -n 100000 -r 100000 -t set
 type is tcp
@@ -131,6 +139,7 @@ rps is 33885.622385
 ### Rocksdb
 
 #### Set
+
 ```text
  % ./benchmark -type tcp -n 100000 -r 100000 -t set
 type is tcp
@@ -165,6 +174,7 @@ rps is 24601.257184
 ```
 
 #### Get
+
 ```text
 % ./benchmark -type tcp -n 100000 -r 100000 -t get
 type is tcp
