@@ -104,56 +104,91 @@ func sendResponse(value []byte, err error, conn net.Conn) error {
 	return e
 }
 
-func (s *Server) get(conn net.Conn, r *bufio.Reader) error {
+func (s *Server) get(ch chan chan *result, r *bufio.Reader) {
+	c := make(chan *result)
+	ch <- c
 	k, e := s.readKey(r)
 	if e != nil {
-		return e
+		c <- &result{nil, e}
+		return
 	}
 
-	v, e := s.Get(k)
-	return sendResponse(v, e, conn)
+	go func() {
+		v, e := s.Get(k)
+		c <- &result{v, e}
+	}()
 }
 
-func (s *Server) set(conn net.Conn, r *bufio.Reader) error {
+func (s *Server) set(ch chan chan *result, r *bufio.Reader) {
+	c := make(chan *result)
+	ch <- c
+
 	k, v, e := s.readKeyAndValue(r)
 	if e != nil {
-		return e
+		c <- &result{nil, e}
+		return
 	}
 
-	return sendResponse(nil, s.Set(k, v), conn)
+	go func() {
+		c <- &result{nil, s.Set(k, v)}
+	}()
 }
 
-func (s *Server) del(conn net.Conn, r *bufio.Reader) error {
+func (s *Server) del(ch chan chan *result, r *bufio.Reader) {
+	c := make(chan *result)
+	ch <- c
+
 	k, e := s.readKey(r)
 	if e != nil {
-		return e
+		c <- &result{nil, e}
+		return
 	}
-	return sendResponse(nil, s.Del(k), conn)
+	go func() {
+		c <- &result{nil, s.Del(k)}
+	}()
+}
+
+type result struct {
+	v []byte
+	e error
 }
 
 func (s *Server) process(conn net.Conn) {
-	defer conn.Close()
 	r := bufio.NewReader(conn)
+	resultCh := make(chan chan *result, 5000)
+	defer close(resultCh)
+
+	go reply(conn, resultCh)
 	for {
 		op, e := r.ReadByte()
-		log.Println(op, e)
 		if e != nil {
 			if e != io.EOF {
-				return
+				log.Println("close connection due to error:", e)
 			}
+			return
 		}
-
 		if op == 'S' {
-			e = s.set(conn, r)
+			s.set(resultCh, r)
 		} else if op == 'G' {
-			e = s.get(conn, r)
+			s.get(resultCh, r)
 		} else if op == 'D' {
-			e = s.del(conn, r)
+			s.del(resultCh, r)
 		} else {
 			log.Println("close connection due to invalid operation:", op)
 			return
 		}
+	}
+}
 
+func reply(conn net.Conn, resultCh chan chan *result) {
+	defer conn.Close()
+	for {
+		c, open := <-resultCh
+		if !open {
+			return
+		}
+		r := <-c
+		e := sendResponse(r.v, r.e, conn)
 		if e != nil {
 			log.Println("close connection due to error:", e)
 			return

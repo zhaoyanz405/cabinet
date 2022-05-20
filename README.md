@@ -15,12 +15,13 @@ run `go build`
 
 ## Benchmark
 
-|           | Set                       | Get                       |
-|-----------|---------------------------|---------------------------|
-| HTTP      | 37 us/op </br> 26107 op/s | 36 us/op </br> 26859 op/s |
-| TCP       | 29 us/op </br> 32406 op/s | 28 us/op </br> 33885 op/s |
-| Rocksdb   | 39 us/op </br> 24601 op/s | 40 us/op </br> 24086 op/s |
-| Pipeline  | 47779 op/s                | 51309 op/s                |
+|          | Set                       | Get                       |
+|----------|---------------------------|---------------------------|
+| HTTP     | 37 us/op </br> 26107 op/s | 36 us/op </br> 26859 op/s |
+| TCP      | 29 us/op </br> 32406 op/s | 28 us/op </br> 33885 op/s |
+| Rocksdb  | 39 us/op </br> 24601 op/s | 40 us/op </br> 24086 op/s |
+| Pipeline | 47779 op/s                | 51309 op/s                |
+| async    |                           | 126671 op/s               |
 
 ### HTTP
 
