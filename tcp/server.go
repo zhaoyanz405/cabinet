@@ -3,6 +3,8 @@ package tcp
 import (
 	"bufio"
 	"cabinet/cache"
+	"cabinet/cluster"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -13,6 +15,7 @@ import (
 
 type Server struct {
 	cache.Cache
+	cluster.Node
 }
 
 func (s *Server) Listen() {
@@ -32,8 +35,8 @@ func (s *Server) Listen() {
 	}
 }
 
-func New(c cache.Cache) *Server {
-	return &Server{c}
+func New(c cache.Cache, n cluster.Node) *Server {
+	return &Server{c, n}
 }
 
 func (s *Server) readKey(r *bufio.Reader) (string, error) {
@@ -48,7 +51,13 @@ func (s *Server) readKey(r *bufio.Reader) (string, error) {
 		return "", e
 	}
 
-	return string(k), nil
+	key := string(k)
+	addr, ok := s.ShouldProcess(key)
+	if !ok {
+		return "", errors.New("redirect " + addr)
+	}
+
+	return key, nil
 }
 
 func (s *Server) readKeyAndValue(r *bufio.Reader) (string, []byte, error) {
@@ -68,13 +77,19 @@ func (s *Server) readKeyAndValue(r *bufio.Reader) (string, []byte, error) {
 		return "", nil, e
 	}
 
+	key := string(k)
+	addr, ok := s.ShouldProcess(key)
+	if !ok {
+		return "", nil, errors.New("redirect " + addr)
+	}
+
 	v := make([]byte, vlen)
 	_, e = io.ReadFull(r, v)
 	if e != nil {
 		return "", nil, e
 	}
 
-	return string(k), v, nil
+	return key, v, nil
 }
 
 func readLen(r *bufio.Reader) (int, error) {
