@@ -3,6 +3,7 @@ package cluster
 import (
 	"github.com/hashicorp/memberlist"
 	"io/ioutil"
+	"log"
 	"stathat.com/c/consistent"
 	"time"
 )
@@ -34,6 +35,7 @@ func New(addr, cluster string) (Node, error) {
 	conf.LogOutput = ioutil.Discard
 	l, e := memberlist.Create(conf)
 	if e != nil {
+		log.Println("failed to create member list, err is ", e.Error())
 		return nil, e
 	}
 	if cluster == "" {
